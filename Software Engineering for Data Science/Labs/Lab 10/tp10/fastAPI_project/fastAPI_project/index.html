@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP 10</title>
+    <style>
+      body {
+          font-family: 'Arial', sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #e6f7ff;
+          color: #333;
+          line-height: 1.6;
+      }
+
+      h1 {
+          color: #004d99;
+          text-align: center;
+          margin-top: 30px;
+          font-size: 2.5rem;
+      }
+
+      .container {
+          width: 90%;
+          margin: 20px auto;
+          padding: 20px;
+          background-color: #ffffff;
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          justify-content: space-between;
+      }
+
+      .form {
+          flex: 1;
+          min-width: 300px;
+          max-width: 48%;
+          background-color: #f0f8ff;
+          border: 1px solid #b3d9ff;
+          border-radius: 8px;
+          padding: 15px;
+      }
+
+      h2 {
+          font-size: 1.5rem;
+          color: #005580;
+          margin-bottom: 10px;
+      }
+
+      label {
+          display: block;
+          font-weight: bold;
+          margin-bottom: 5px;
+          color: #00334d;
+      }
+
+      input {
+          padding: 10px;
+          margin-bottom: 10px;
+          border: 1px solid #cce7ff;
+          border-radius: 6px;
+          width: 100%;
+          box-sizing: border-box;
+          font-size: 1rem;
+      }
+
+      input:focus {
+          outline: none;
+          border-color: #66b2ff;
+      }
+
+      .button-group {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+
+      button {
+          padding: 10px 20px;
+          border: none;
+          border-radius: 6px;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+      }
+
+      .btn-left {
+          background-color: #ff9999;
+          color: #fff;
+      }
+
+      .btn-left:hover {
+          background-color: #e68a8a;
+      }
+
+      .btn-right {
+          background-color: #4CAF50;
+          color: white;
+      }
+
+      .btn-right:hover {
+          background-color: #45a049;
+      }
+
+      @media (max-width: 768px) {
+          .row {
+              flex-direction: column;
+          }
+
+          .form-group {
+              max-width: 100%;
+              margin-bottom: 20px;
+          }
+      }
+  </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>SEDS LAB 10</h1>
+
+        <!-- Create User -->
+        <div class="row">
+          <div class="form-group">
+              <h2>Create User</h2>
+              <label for="createName">Name:</label>
+              <input type="text" id="createName" placeholder="Enter Name">
+              <label for="createEmail">Email:</label>
+              <input type="email" id="createEmail" placeholder="Enter Email">
+              <button onclick="createUser()">Create User</button>
+          </div>
+        
+          <hr>
+
+          <!-- Get All Users -->
+          <div class="form-group">
+              <h2>Get All Users</h2>
+              <button onclick="getUsers()">Get all user</button>
+          </div>
+        
+      </div>
+        <hr>
+
+        <!-- Get User by ID -->
+        <div class="row">
+          <div class="form-group">
+              <h2>Get User by ID</h2>
+              <label for="userId">User ID:</label>
+              <input type="number" id="userId" placeholder="Enter User ID">
+              <button onclick="getUser()">Get User</button>
+          </div>
+          <hr>
+
+        
+          <!-- Update User -->
+          <div class="form-group">
+              <h2>Update User</h2>
+              <label for="updateUserId">User ID:</label>
+              <input type="number" id="updateUserId" placeholder="Enter User ID">
+              <label for="updateName">Name:</label>
+              <input type="text" id="updateName" placeholder="Enter New Name">
+              <label for="updateEmail">Email:</label>
+              <input type="email" id="updateEmail" placeholder="Enter New Email">
+              <button onclick="updateUser()">Update User</button>
+          </div>
+      </div>
+
+        <hr>
+
+        <!-- Delete User post -->
+        <div class="row">
+          <div class="form-group">
+              <h2>Delete User posts</h2>
+              <label for="deleteUserId">User ID:</label>
+              <input type="number" id="deleteUserId" placeholder="Enter User ID">
+              <label for="deleteUserId">post ID:</label>
+              <input type="number" id="deletePostId" placeholder="Enter post ID">
+              <button onclick="deleteUser()">Delete User post</button>
+          </div>
+          
+          <hr>
+          
+          <!-- Get User Posts -->
+          <div class="form-group">
+              <h2>Get User Posts</h2>
+              <label for="userIdPosts">User ID:</label>
+              <input type="number" id="userIdPosts" placeholder="Enter User ID">
+              <button onclick="getUserPosts()">Get Posts</button>
+          </div>
+          
+        </div>
+        <hr>
+
+        <!-- Create Post for User -->
+        <div class="form-group">
+            <h2>Create Post for User</h2>
+            <label for="postUserId">User ID:</label>
+            <input type="number" id="postUserId" placeholder="Enter User ID">
+            <label for="postTitle">Post Title:</label>
+            <input type="text" id="postTitle" placeholder="Enter Post Title">
+            <label for="postContent">Post Content:</label>
+            <input type="text" id="postContent" placeholder="Enter Post Content">
+            <label for="postPublishedAt">Published At:</label>
+            <input type="datetime-local" id="postPublishedAt">
+            <button onclick="createPost()">Create Post</button>
+        </div>
+
+        <div id="output" class="results"></div>
+    </div>
+
+    <script>
+        const apiUrl = "http://localhost:8000";
+
+        async function createUser() {
+            const name = document.getElementById("createName").value;
+            const email = document.getElementById("createEmail").value;
+
+            const response = await fetch(`${apiUrl}/users/new`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email }),
+            });
+
+            displayResponse(response);
+        }
+
+        async function getUsers() {
+            const response = await fetch(`${apiUrl}/users/`);
+            displayResponse(response);
+        }
+
+        async function getUser() {
+            const userId = document.getElementById("userId").value;
+            const response = await fetch(`${apiUrl}/users/${userId}`);
+            displayResponse(response);
+        }
+
+        async function updateUser() {
+            const userId = document.getElementById("updateUserId").value;
+            const name = document.getElementById("updateName").value;
+            const email = document.getElementById("updateEmail").value;
+
+            const response = await fetch(`${apiUrl}/users/${userId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email }),
+            });
+
+            displayResponse(response);
+        }
+
+        async function deleteUser() {
+            const userId = document.getElementById("deleteUserId").value;
+            const postId = document.getElementById("deletePostId").value;
+            const response = await fetch(`${apiUrl}/users/${userId}/delete_post/${postId}`, {
+                method: "DELETE",
+            });
+            displayResponse(response);
+        }
+
+        async function getUserPosts() {
+            const userId = document.getElementById("userIdPosts").value;
+            const response = await fetch(`${apiUrl}/users/${userId}/posts/`);
+            displayResponse(response);
+        }
+
+        async function createPost() {
+            const userId = document.getElementById("postUserId").value;
+            const title = document.getElementById("postTitle").value;
+            const content = document.getElementById("postContent").value;
+            const publishedAt = document.getElementById("postPublishedAt").value;
+
+            // Convert the input datetime-local value to ISO 8601 format (UTC)
+            const isoPublishedAt = new Date(publishedAt).toISOString();
+
+            const response = await fetch(`${apiUrl}/users/${userId}/posts/new`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, content, publishedAt: isoPublishedAt }),
+            });
+
+            displayResponse(response);
+        }
+
+        async function displayResponse(response) {
+            const output = document.getElementById("output");
+            const data = await response.json();
+
+            if (response.ok) {
+                output.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } else {
+                output.innerHTML = `<p class="error">Error: ${data.detail || "An error occurred"}</p>`;
+            }
+        }
+    </script>
+
+<script>
+  function validateAndCreateUser() {
+      const name = document.getElementById('createName').value.trim();
+      const email = document.getElementById('createEmail').value.trim();
+      const emailError = document.getElementById('emailError');
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!name) {
+          alert("Name is required");
+          return;
+      }
+
+      if (!emailRegex.test(email)) {
+          emailError.style.display = 'block';
+          return;
+      } else {
+          emailError.style.display = 'none';
+      }
+
+      fetch('/api/create-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+      })
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error("Failed to create user");
+              }
+              return response.json();
+          })
+          .then(data => {
+              alert("User created successfully!");
+          })
+          .catch(error => {
+              alert(error.message || "An error occurred");
+          });
+  }
+</script>
+</body>
+</html>

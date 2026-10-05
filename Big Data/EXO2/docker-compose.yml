@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+
+  spark:
+    image: bitnami/spark:3.5
+    container_name: spark-exo2
+    tty: true
+    stdin_open: true
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: tail -f /dev/null

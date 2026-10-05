@@ -1,30 +1,34 @@
-# Python
-__pycache__/
-*.py[cod]
-
-# Virtual environments
-.venv/
-venv/
-env/
-ENV/
-ml-env/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Environment variables
-.env
-
-# IDE
-.vscode/
-.idea/
-
-# OS files
 .DS_Store
-Thumbs.db
-desktop.ini
-*.lnk
+._*
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+.vscode/
 
-# Large datasets / archives
-*.tar.gz
+# Unity generated files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+*.csproj
+*.sln
+*.user
+*.userprefs
 
+# Unity generated files
+**/_Recovery/
+*.slnx
+.vs/
+
+# Unity generated files
+**/_Recovery/
+*.slnx
+.vs/
+
+Big Data/Labs/TP1/Lab1_Data/purchases.txt
+
+Big Data/Labs/TP1/Lab1_Data/purchases.txt

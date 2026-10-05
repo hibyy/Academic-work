@@ -1,0 +1,128 @@
+version: "3"
+
+services:
+
+  airflow-webserver:
+    hostname: myairflow
+    container_name: airflow_container
+    image: puckel/docker-airflow:1.10.9
+    ports:
+      - "8085:8080"
+    networks:
+      - dataworld
+    volumes:
+      - airflow-data:/usr/local/airflow/data
+      - ./airflow/logs:/usr/local/airflow/logs
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/requirements/requirements.txt:/requirements.txt
+    restart: on-failure
+
+  zookeeper:
+    hostname: myzookeeper
+    container_name: zookeeper_container
+    image: bitnami/zookeeper:3.7
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - dataworld
+    restart: always
+
+  nifi:
+    hostname: mynifi
+    container_name: nifi_container
+    image: apache/nifi:1.14.0
+    ports:
+      - "8091:8080"
+    networks:
+      - dataworld
+    volumes:
+      - nifi-database_repository:/opt/nifi/nifi-current/database_repository
+      - nifi-flowfile_repository:/opt/nifi/nifi-current/flowfile_repository
+      - nifi-content_repository:/opt/nifi/nifi-current/content_repository
+      - nifi-provenance_repository:/opt/nifi/nifi-current/provenance_repository
+      - nifi-conf:/opt/nifi/nifi-current/conf
+      - nifi-state:/opt/nifi/nifi-current/state
+      - ./nifi/logs:/opt/nifi/nifi-current/logs
+      - ./nifi/jdbc:/opt/nifi/nifi-current/jdbc
+      - ./nifi/credentials:/opt/nifi/nifi-current/credentials
+    environment:
+      - NIFI_WEB_HTTP_PORT=8080
+      - NIFI_CLUSTER_IS_NODE=true
+      - NIFI_CLUSTER_NODE_PROTOCOL_PORT=8082
+      - NIFI_ZK_CONNECT_STRING=myzookeeper:2181
+      - NIFI_ELECTION_MAX_WAIT=30 sec
+      - NIFI_SENSITIVE_PROPS_KEY=12345678901234567890A
+    restart: on-failure
+
+  registry:
+    hostname: myregistry
+    container_name: registry_container
+    image: apache/nifi-registry:1.15.0
+    ports:
+      - "18080:18080"
+    networks:
+      - dataworld
+    environment:
+      - LOG_LEVEL=INFO
+      - NIFI_REGISTRY_FLOW_PROVIDER=file
+      - NIFI_REGISTRY_FLOW_STORAGE_DIR=/opt/nifi-registry/flow_storage
+    volumes:
+      - ./nifi_registry/database:/opt/nifi-registry/database
+      - ./nifi_registry/flow_storage:/opt/nifi-registry/flow_storage
+    restart: on-failure
+
+  postgres:
+    hostname: mypostgres
+    container_name: postgres_container
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - dataworld
+    restart: on-failure
+
+  pgadmin:
+    hostname: mypgadmin
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - dataworld
+    restart: on-failure
+
+  minio:
+    hostname: myminio
+    container_name: minio_container
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio_admin
+      MINIO_ROOT_PASSWORD: minio_password
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./minio/data:/data
+    networks:
+      - dataworld
+    restart: on-failure
+
+volumes:
+  airflow-data:
+  nifi-database_repository:
+  nifi-flowfile_repository:
+  nifi-content_repository:
+  nifi-provenance_repository:
+  nifi-state:
+  nifi-conf:
+
+networks:
+  dataworld:
+    driver: bridge
